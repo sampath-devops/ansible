@@ -1,0 +1,7 @@
+---
+# tasks file for dbserver
+- name: install mysql-server
+  yum: name=mysql-server state=installed
+
+- name: starting mysql service
+  service: name=mysqld state=started

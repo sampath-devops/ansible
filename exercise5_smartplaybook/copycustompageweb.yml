@@ -1,0 +1,97 @@
+--- # copying the custom web page into remote web servers
+- hosts: webservers
+  become: yes
+  vars:
+     http_port: 800
+     doc_dir: /ansible/
+     doc_root: /var/www/html/
+     max_clients: 5
+ 
+  vars_prompt:
+    name: username
+    prompt: 'enter ur name:'
+ 
+  tasks:
+  - name: install apache service in centos
+    yum: name=httpd state=installed
+    when: ansible_os_family == 'RedHat'
+  
+  - name: install apache service in ubuntu
+    apt: name=apache2 state=installed
+    when: ansible_os_family == 'Debian'
+
+  - name: creating the ansible directory
+    file: path={{ doc_root }}/{{ doc_dir }} state=directory 
+
+  - name: deploying the web application
+    template: src=templates/index.j2 dest={{ doc_root }}/{{ doc_dir }}/index.html mode=0644
+    notify: restart apache
+    
+  - name: copying the httpd.conf file in to the remote mechines centos
+    template: src=templates/httpd.j2 dest=/etc/httpd/conf/httpd.conf
+    when: ansible_os_family == 'RedHat'
+    notify: restart apache
+  
+  - name: copying the httpd.conf file in to the remote mechines ubuntu
+    template: src=templates/apache2.j2 dest=/etc/apache2/sites-available/apache2.conf
+    when: ansible_os_family == 'Debian'
+    notify: restart apache
+ 
+  - name: starting apache service in centos
+    service: name=httpd state=started
+    when: ansible_os_family == 'RedHat'
+
+  - name: starting apache service in ubuntu
+    service: name=apache2 state=started
+    when: ansible_os_family == 'Debian'
+  
+  handlers:
+  - name: restart apache
+    service: name=httpd state=restarted
+    when: ansible_os_family == 'RedHat'
+   
+    service: name=apache2 state=started
+    when: ansible_os_family == 'Debian'
+
+
+
+
+
+
+
+
+
+- hosts: dbservers
+  become: yes
+  
+  tasks: 
+  - name: install mysql-server
+    yum: name=mysql-server state=installed
+  - name: starting mysql service
+    service: name=mysqld state=started
+
+- hosts: webservers:dbservers
+  become: yes
+  
+  tasks:
+  - name: stoping iptables service
+    service: name=iptables state=stopped
+    when: ansible_os_family == 'RedHat'
+
+#- hosts: datacenter
+#  become: yes
+ 
+#  tasks:
+#  - name: install apache service
+#    yum: name=httpd state=removed
+#  - name: starting apache service
+#    service: name=httpd state=started
+
+#  - name: install mysql-server
+#    yum: name=mysql-server state=removed
+#  - name: starting mysql service
+#    service: name=mysqld state=started
+
+#  - name: stoping iptables service
+#    service: name=iptables state=stopped
+

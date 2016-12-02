@@ -1,0 +1,7 @@
+---
+# vars file for webserver
+     http_port: 800
+     doc_dir: /ansible/
+     doc_root: /var/www/html/
+     max_clients: 5
+     username: sampath

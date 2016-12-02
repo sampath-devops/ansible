@@ -1,0 +1,21 @@
+--- # copying the custom web page into remote web servers
+- hosts: webservers
+  become: yes
+  roles:
+    - webserver
+    - geerlingguy.git 
+    - dbserver  
+
+ 
+  
+  
+  
+
+
+
+
+
+
+
+
+

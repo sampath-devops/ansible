@@ -1,0 +1,48 @@
+---
+# tasks file for webserver
+  - name: install apache service in centos
+    yum: name=httpd state=installed
+    when: ansible_os_family == 'RedHat'
+  
+  - name: install apache service in ubuntu
+    apt: name=apache2 state=installed
+    when: ansible_os_family == 'Debian'
+
+  - name: creating the ansible directory
+    file: path={{ doc_root }}/{{ doc_dir }} state=directory 
+
+  - name: deploying the web application in RedHat family
+    template: src=index.j2 dest={{ doc_root }}/{{ doc_dir }}/index.html mode=0644
+    when: ansible_os_family == 'RedHat'
+    notify: restart apache
+  
+  - name: deploying the web application in RedHat family
+    template: src=index.j2 dest={{ doc_root }}/{{ doc_dir }}/index.html mode=0644
+    when: ansible_os_family == 'Debian'  
+    notify: restart apchae2
+    
+  - name: copying the httpd.conf file in to the remote mechines centos
+    template: src=httpd.j2 dest=/etc/httpd/conf/httpd.conf
+    when: ansible_os_family == 'RedHat'
+    notify: restart apache
+  
+  - name: copying the httpd.conf file in to the remote mechines ubuntu
+    template: src=apache2.j2 dest=/etc/apache2/sites-available/apache2.conf
+    when: ansible_os_family == 'Debian'
+    notify: restart apache
+ 
+  - name: starting apache service in centos
+    service: name=httpd state=started enabled=yes
+    when: ansible_os_family == 'RedHat'
+
+  - name: starting apache service in ubuntu
+    service: name=apache2 state=started enabled=yes
+    when: ansible_os_family == 'Debian'
+    
+  - name: stoping iptables service
+    service: name=iptables state=stopped
+    when: ansible_os_family == 'RedHat'
+   
+  - name: stoping ufw service
+    service: name=ufw state=stopped
+    when: ansible_os_family == 'Debian' 

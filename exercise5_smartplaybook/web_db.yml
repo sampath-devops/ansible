@@ -1,0 +1,55 @@
+---
+- hosts: webservers
+  become: yes
+ 
+  tasks:
+  - name: install apache service in centos
+    yum: name=httpd state=installed
+    when: ansible_os_family == 'RedHat'
+  - name: install apache service in ubuntu
+    apt: name=apache2 state=installed
+    when: ansible_os_family == 'Debian'
+  - name: starting apache service in centos
+    service: name=httpd state=started
+    when: ansible_os_family == 'RedHat'
+  - name: starting apache service in ubuntu
+    service: name=apache2 state=started
+    when: ansible_os_family == 'Debian'
+
+- hosts: dbservers
+  become: yes
+  
+  tasks: 
+  - name: install mysql-server
+    yum: name=mysql-server state=installed
+  - name: starting mysql service
+    service: name=mysqld state=started
+
+- hosts: webservers:dbservers
+  become: yes
+  
+  tasks:
+  - name: stoping iptables service
+    service: name=iptables state=stopped
+    when: ansible_os_family == 'RedHat'
+  - name: stoping iptables service in ubuntu
+    service: name=ufw state=stopped
+    when: ansible_os_family == 'Debian'
+
+#- hosts: datacenter
+#  become: yes
+ 
+#  tasks:
+#  - name: install apache service
+#    yum: name=httpd state=removed
+#  - name: starting apache service
+#    service: name=httpd state=started
+
+#  - name: install mysql-server
+#    yum: name=mysql-server state=removed
+#  - name: starting mysql service
+#    service: name=mysqld state=started
+
+#  - name: stoping iptables service
+#    service: name=iptables state=stopped
+
