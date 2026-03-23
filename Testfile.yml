@@ -1,0 +1,9 @@
+---
+- name: playbook to create the empty text file
+  hosts: all
+  become: yes
+  tasks:
+    - name: create the empty file
+      ansible.builtin.file:
+        path: "/tmp/file.txt"
+        state: touch
