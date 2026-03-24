@@ -1,0 +1,9 @@
+---
+- name: playbook to copy the files to all app servers
+  hosts: all
+  become: yes
+  tasks:
+    - name: Copy the files
+      ansible.builtin.copy:
+        src: /usr/src/security/index.html
+        dest: /opt/security/
