@@ -1,0 +1,12 @@
+---
+- name: Create an empty file with specific owner and permissions
+  hosts: all
+  become: true  # Needed to manage files that may require elevated privileges
+  tasks:
+    - name: Create file and set ownership and mode
+      ansible.builtin.file:
+        path: /usr/src/webdata.txt # Specify the full path to the file
+        state: touch                 # Creates an empty file if it does not exist
+        owner: "{{ansible_user}}"              # Set the owner to a specific individual user
+        group: "{{ansible_user}}"          # Set the group (optional, but good practice)
+        mode: '0777'                 # Set the file permissions in octal notation
