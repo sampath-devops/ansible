@@ -1,0 +1,19 @@
+---
+- name: Instalation of VSFTD
+  hosts: all
+  become: yes
+  tasks:
+    - name: Install vsftpd
+      ansible.builtin.yum:
+        name: vsftpd
+        state: present
+    - name: Start vsftpd
+      ansible.builtin.service:
+        name: vsftpd
+        state: started
+        enabled: yes
+    - name: status of vsftpd
+      ansible.builtin.service_facts:
+    - name: verifying the service
+      ansible.builtin.assert:
+        that: ansible_facts.services['vsftpd.service'].state== 'running'
