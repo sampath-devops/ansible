@@ -1,0 +1,49 @@
+---
+- name: applying ACL properties to files
+  hosts: all
+  become: yes
+  tasks:
+    - name: creating a file on App server 1
+      ansible.builtin.file: 
+        path: /opt/security/blog.txt
+        state: touch
+      when: inventory_hostname in ['stapp01']
+
+    - name: applying ACL properties to files
+      ansible.posix.acl: 
+        path: /opt/security/blog.txt
+        entity: tony
+        etype: group
+        permissions: r
+        state: present
+      when: inventory_hostname in ['stapp01']
+
+    - name: creating a file on App server 2
+      ansible.builtin.file: 
+        path: /opt/security/story.txt
+        state: touch
+      when: inventory_hostname in ['stapp02']
+
+    - name: applying ACL properties to files
+      ansible.posix.acl: 
+        path: /opt/security/story.txt
+        entity: steve
+        etype: user
+        permissions: rw
+        state: present
+      when: inventory_hostname in ['stapp02']
+      
+    - name: creating a file on App server 3
+      ansible.builtin.file: 
+        path: /opt/security/media.txt
+        state: touch
+      when: inventory_hostname in ['stapp03']
+
+    - name: applying ACL properties to files
+      ansible.posix.acl: 
+        path: /opt/security/media.txt
+        entity: banner
+        etype: group
+        permissions: rw
+        state: present
+      when: inventory_hostname in ['stapp03']
